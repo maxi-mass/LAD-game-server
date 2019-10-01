@@ -9,26 +9,7 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 
-const clearState = () => {
-    let board = [];
-    for (let r = 0; r < 6; r++) {
-        let row = [];
-        for (let c = 0; c < 7; c++) {
-            row.push(null)
-        }
-        board.push(row);
-    }
-    return {
-        player1: 1,
-        player2: 2,
-        currentPlayer: 1,
-        board,
-        isGameOver: false,
-        message: ""
-    }
-};
-
-let state = clearState();
+let state;
 
 const checkVertical = function (board) {
     for (let r = 3; r < 6; r++) {
@@ -101,9 +82,24 @@ const checkAll = board => {
     return checkVertical(board) || checkDiagonalRight(board) || checkDiagonalLeft(board) || checkHorizontal(board) || checkDraw(board);
 };
 
-
-app.get('/data', function (req, res) {
-    res.send(state);
+app.get('/data', function (request, response) {
+    let board = [];
+    for (let r = 0; r < 6; r++) {
+        let row = [];
+        for (let c = 0; c < 7; c++) {
+            row.push(null)
+        }
+        board.push(row);
+    }
+    state = {
+        player1: 1,
+        player2: 2,
+        currentPlayer: 1,
+        board,
+        isGameOver: false,
+        message: ""
+    };
+    response.send(state);
 });
 
 app.post('/play', function (request, response) {
@@ -129,7 +125,7 @@ app.post('/play', function (request, response) {
         state.isGameOver = true;
         state.message = 'Ничья';
     } else {
-        state.currentPlayer = (state.currentPlayer == state.player1) ? state.player2 : state.player1;
+        state.currentPlayer = (state.currentPlayer === state.player1) ? state.player2 : state.player1;
     }
 
     response.send(state);
