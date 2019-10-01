@@ -9,7 +9,24 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 
-let state;
+// Создаем пустое игровое поле, представляющее собой 7 столбцов в 6 клеток высотой
+let board = [];
+for (let r = 0; r < 6; r++) {
+    let row = [];
+    for (let c = 0; c < 7; c++) {
+        row.push(null)
+    }
+    board.push(row);
+}
+
+let state = {
+    player1: 1,
+    player2: 2,
+    currentPlayer: 1,
+    board,
+    isGameOver: false,
+    message: ""
+};
 
 const checkVertical = function (board) {
     for (let r = 3; r < 6; r++) {
@@ -82,7 +99,7 @@ const checkAll = board => {
     return checkVertical(board) || checkDiagonalRight(board) || checkDiagonalLeft(board) || checkHorizontal(board) || checkDraw(board);
 };
 
-app.get('/data', function (request, response) {
+app.get('/data', function (req, res) {
     let board = [];
     for (let r = 0; r < 6; r++) {
         let row = [];
@@ -91,6 +108,7 @@ app.get('/data', function (request, response) {
         }
         board.push(row);
     }
+    
     state = {
         player1: 1,
         player2: 2,
@@ -99,7 +117,8 @@ app.get('/data', function (request, response) {
         isGameOver: false,
         message: ""
     };
-    response.send(state);
+
+    res.send(state);
 });
 
 app.post('/play', function (request, response) {
@@ -125,7 +144,7 @@ app.post('/play', function (request, response) {
         state.isGameOver = true;
         state.message = 'Ничья';
     } else {
-        state.currentPlayer = (state.currentPlayer === state.player1) ? state.player2 : state.player1;
+        state.currentPlayer = (state.currentPlayer == state.player1) ? state.player2 : state.player1;
     }
 
     response.send(state);
